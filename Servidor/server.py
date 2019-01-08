@@ -65,10 +65,10 @@ if __name__ == '__main__':
         canal.start()
 
     # Roda o servidor
-    with socketserver.TCPServer(('', 6060), MyTCPHandler) as server:
-        try:
-            print("Starting server!")
-            server.serve_forever()
-        except KeyboardInterrupt:
-            server.shutdown()
-    
+    server =  socketserver.TCPServer(('', 6060), MyTCPHandler)
+    try:
+        print("Starting server!")
+        server.serve_forever()
+    except KeyboardInterrupt:
+        server.shutdown()
+
