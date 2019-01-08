@@ -29,7 +29,7 @@ public class Canal extends Thread {
 					out.write(buffer, 0, leu);
 					out.flush();
 				}
-				System.out.print("Video enviado para " + cliente.getHostName());
+				System.out.println("Video enviado para " + cliente.getHostName());
 			} catch (IOException e) {
 				remover(cliente);
 			}

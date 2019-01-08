@@ -12,12 +12,13 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Cliente extends Thread {
+public class Cliente implements Runnable {
 	InetSocketAddress raiz = null;
 	InetSocketAddress atual = null;
 	String canal = null;
 	ServerSocket server = null;
 	int timeout = 3000;
+	Thread thread = null;
 	
 	public Cliente(String ip, String canal) {
 		this.raiz = new InetSocketAddress(ip, 6060);
@@ -61,7 +62,8 @@ public class Cliente extends Thread {
 					break;
 				case "10":
 					System.out.println("Iniciando thread");
-					this.start();
+					thread = new Thread(this);
+					thread.start();
 					return;
 				default:
 					break;
@@ -109,7 +111,7 @@ public class Cliente extends Thread {
 			out.flush();
 			
 			server.close();
-			this.join();
+			thread.join();
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
