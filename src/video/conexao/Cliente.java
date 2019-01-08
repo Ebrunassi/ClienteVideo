@@ -143,7 +143,7 @@ public class Cliente extends Thread {
 			}
 			System.out.println("Filme recebido");
 			
-			//TODO abrir vídeo
+			//TODO abrir video
 			
 			servidor.transmitir();
 		}
