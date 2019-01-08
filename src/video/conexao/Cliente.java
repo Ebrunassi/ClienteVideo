@@ -73,7 +73,7 @@ public class Cliente extends Thread {
 	}
 
 	private boolean requisitarConexao() {
-		try (Socket socket = new Socket(atual.getAddress(), atual.getPort());
+		try (Socket socket = new Socket(atual.getAddress(), 6060);
 				PrintStream out = new PrintStream(socket.getOutputStream());) {
 			out.println("10" + canal);
 			out.flush();
