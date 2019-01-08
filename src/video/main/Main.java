@@ -20,27 +20,32 @@ public class Main{
         
         System.out.println("Conexao ao servidor:");
         System.out.print("IP: ");
-        ip=sc.nextLine();
+//        ip=sc.nextLine();
+        ip = "192.168.0.28";
 
         
         System.out.println("Servidor local:");
         System.out.print("CANAIS: ");
-        qtdCanal= sc.nextInt();
+//        qtdCanal= sc.nextInt();
+        qtdCanal = 1;
         System.out.print("MAX CONEXOES: ");
-        maxConecoes= sc.nextInt();
-        sc.close();
+//        maxConecoes= sc.nextInt();
+        maxConecoes = 1;
         
         Cliente cliente = new Cliente(ip,porta,timeout);
         Servidor servidor = new Servidor(porta,qtdCanal,maxConecoes,cliente);
         
-//        ThreadListar listar = new ThreadListar(cliente, 0);//cliente ligado no canal 0
         ThreadPrompt prompt = new ThreadPrompt(cliente);
-//        ThreadReceber receber = new ThreadReceber(ip,porta_entrada,servidor);
         servidor.start();
         cliente.start();
-//        listar.start();
         prompt.start();
-//        receber.start();
+        try {
+			prompt.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+        
+        sc.close();
         
          
     }
