@@ -17,7 +17,7 @@ public class Cliente implements Runnable {
 	InetSocketAddress atual = null;
 	String canal = null;
 	ServerSocket server = null;
-	int timeout = 3000;
+	int timeout = 8000;
 	Thread thread = null;
 	
 	public Cliente(String ip, String canal) {
