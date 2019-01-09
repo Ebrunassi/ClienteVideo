@@ -61,9 +61,9 @@ public class Cliente implements Runnable {
 					}
 					break;
 				case "10":
-					System.out.println("Iniciando thread");
 					thread = new Thread(this);
 					thread.start();
+					System.out.println("Iniciando recebimento de videos.");
 					return;
 				default:
 					break;
@@ -138,7 +138,7 @@ public class Cliente implements Runnable {
 				break;
 			} catch (SocketException e) {
 				servidor.encerrar();
-				System.out.println("Encerrando thread");
+				System.out.println("Encerrando recebimento de videos.");
 				break;
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -146,6 +146,14 @@ public class Cliente implements Runnable {
 			System.out.println("Filme recebido");
 			
 			//TODO abrir video
+			
+			try {
+				ProcessBuilder builder = new ProcessBuilder("C:\\Program Files\\VideoLAN\\VLC\\vlc.exe","--one-instance","filme.mp4");
+				builder.start();
+			} catch (IOException e) {
+				System.out.println("Para reproduzir o video instale o vlc.");
+			}
+			
 			
 			servidor.transmitir();
 		}

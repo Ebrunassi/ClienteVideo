@@ -6,14 +6,13 @@ import video.thread.ThreadPrompt;
 
 public class Main{
     public static void main(String args[]) throws IOException{
+    	String ip;
         Scanner sc = new Scanner (System.in);
         System.out.println("Servico de transmissao de video iniciado...");
-        System.out.println("Por favor, insira alguns dados para realizar a configuracao.");
         
-        System.out.println("Conexao ao servidor:");
+        System.out.println("Por favor, insira o ip do servidor :");
         System.out.print("IP: ");
-//        ip=sc.nextLine();
-        String ip = "192.168.0.32";
+        ip=sc.nextLine();
         
         ThreadPrompt prompt = new ThreadPrompt(ip);
         prompt.start();

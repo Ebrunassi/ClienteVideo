@@ -23,14 +23,14 @@ public class Servidor extends Thread {
 		this.canal = new Canal(1);
 		this.start();
 		
-		System.out.println("Servidor iniciado");
+		System.out.println("Servidor local iniciado");
 	}
 	
 	public void encerrar() {
 		try {
 			servidor.close();
 			this.join();
-			System.out.println("Servidor encerrado...");
+			System.out.println("Servidor local encerrado.");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
