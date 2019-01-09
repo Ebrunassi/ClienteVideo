@@ -19,16 +19,17 @@ public class Cliente implements Runnable {
 	ServerSocket server = null;
 	int timeout = 8000;
 	Thread thread = null;
+	int max;
 	
-	public Cliente(String ip, String canal) {
-		this.raiz = new InetSocketAddress(ip, 6060);
+	public Cliente(String ip, String canal,int max) {
+		this.raiz = new InetSocketAddress(ip, 6060);// guarda o servidor raiz pra fazer conexao no futuro.
 		this.canal = canal;
-		
+		this.max = max;
 		try {
 			server = new ServerSocket(9091);
-			server.setSoTimeout(timeout);
+			server.setSoTimeout(timeout);//define o timeout para receber os mensagens e videos
 			
-			conectar();
+			conectar();// busca a primeira conexao
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -36,31 +37,33 @@ public class Cliente implements Runnable {
 	
 	public void conectar() {
 		ArrayList<InetSocketAddress> fila = new ArrayList<InetSocketAddress>();
-		fila.add(raiz);
+		fila.add(raiz); // sempre tenta conectar primeiro no servidor raiz.
 		int i = 0;
 		
 		while(true) {
 			atual = fila.get(i);
 			
 			if(!requisitarConexao()) {
-				fila.remove(i);
+				fila.remove(i);// está desconectado, remove da lista.
 				continue;
 			}
 			
+			
+			// recebe confirmaçao se pode ou nao se conectar
 			try (Socket socket = server.accept();
 					Scanner scan = new Scanner(socket.getInputStream());) {
-				String message = scan.nextLine().trim();
+				String msg = scan.nextLine().trim();
 				
-				switch (message.substring(0, 2)) {
-				case "00":
+				switch (msg.substring(0, 2)) {
+				case "00":// canal cheio, adiciona clientes conectados nele na lista e procura proximo canal 
 					if(obterClientes(fila, i)) {
 						i++;
-						if(i > fila.size()) {
+						if(i > fila.size()) {// retorna para o inicio da fila, e fica  fazendo ciclo até achar conexao
 							i = 0;
 						}
 					}
 					break;
-				case "10":
+				case "10":// comeca a receber dados
 					thread = new Thread(this);
 					thread.start();
 					System.out.println("Iniciando recebimento de videos.");
@@ -77,7 +80,7 @@ public class Cliente implements Runnable {
 	private boolean requisitarConexao() {
 		try (Socket socket = new Socket(atual.getAddress(), 6060);
 				PrintStream out = new PrintStream(socket.getOutputStream());) {
-			out.println("10" + canal);
+			out.println("10" + canal);// pergunta se pode transmitir
 			out.flush();
 			return true;
 		} catch (IOException e) {
@@ -86,7 +89,7 @@ public class Cliente implements Runnable {
 		}
 	}
 	
-	public boolean obterClientes(ArrayList<InetSocketAddress> fila, int i) throws IOException {
+	public boolean obterClientes(ArrayList<InetSocketAddress> fila, int i) throws IOException { // cria uma lista
 		try (Socket socket = new Socket(atual.getAddress(), atual.getPort());
 				PrintStream out = new PrintStream(socket.getOutputStream());
 				Scanner scan = new Scanner(socket.getInputStream());) {
@@ -103,15 +106,15 @@ public class Cliente implements Runnable {
 		}
 	}
 	
-	public void encerrar() {
+	public void encerrar() { 
 		try (Socket socket = new Socket(atual.getAddress(), 6060);
 				PrintStream out = new PrintStream(socket.getOutputStream());
 				Scanner in = new Scanner(socket.getInputStream());){
-			out.println("12" + canal);
+			out.println("12" + canal);//desconecta do servidor
 			out.flush();
 			
-			server.close();
-			thread.join();
+			server.close();// cria a exceção que mata a thread de recebimento de videos
+			thread.join();// espera a thread parar aqui.
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -119,7 +122,7 @@ public class Cliente implements Runnable {
 	
 	@Override
 	public void run() {
-		Servidor servidor = new Servidor();
+		Servidor servidor = new Servidor(max);// comecou a receber videos entao pode comecar a transmitir
 		
 		while(true) {
 			try (Socket socket = server.accept();
@@ -128,34 +131,36 @@ public class Cliente implements Runnable {
 				
 				int leu;
 				byte[] buffer = new byte[1024];
-				while((leu = in.read(buffer)) > 0) {
+				while((leu = in.read(buffer)) > 0) { // recebe um video
 					file.write(buffer, 0, leu);
 					file.flush();
 				}
-			} catch (SocketTimeoutException e) {
+			} catch (SocketTimeoutException e) { // desconectou do servidor, faz a reconexao.
 				servidor.encerrar();
 				conectar();
 				break;
 			} catch (SocketException e) {
 				servidor.encerrar();
 				System.out.println("Encerrando recebimento de videos.");
-				break;
+				break;// sai do while e "mata" a thread
 			} catch (IOException e) {
-				e.printStackTrace();
+				e.printStackTrace();// erro 
 			}
 			System.out.println("Filme recebido");
 			
 			//TODO abrir video
 			
 			try {
-				ProcessBuilder builder = new ProcessBuilder("C:\\Program Files\\VideoLAN\\VLC\\vlc.exe","--one-instance","filme.mp4");
+				ProcessBuilder builder = new ProcessBuilder("C:\\Program Files\\VideoLAN\\VLC\\vlc.exe","--one-instance","filme.mp4");//comando para o windows.
+				//ProcessBuilder builder = new ProcessBuilder("mpv","filme.mp4");// comando para o linux;
+				
 				builder.start();
 			} catch (IOException e) {
 				System.out.println("Para reproduzir o video instale o vlc.");
 			}
 			
 			
-			servidor.transmitir();
+			servidor.transmitir();//retransmissao
 		}
 	}
 }

@@ -13,14 +13,14 @@ public class Servidor extends Thread {
 	ServerSocket servidor = null;
 	Canal canal = null;
 	
-	public Servidor() {
+	public Servidor(int max) {
 		try {
 			this.servidor = new ServerSocket(6060);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		this.canal = new Canal(1);
+		this.canal = new Canal(max);
 		this.start();
 		
 		System.out.println("Servidor local iniciado");
@@ -28,8 +28,8 @@ public class Servidor extends Thread {
 	
 	public void encerrar() {
 		try {
-			servidor.close();
-			this.join();
+			servidor.close();// cria a excecao que mata a thread
+			this.join();//espera a thread chegar aqui
 			System.out.println("Servidor local encerrado.");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -42,10 +42,10 @@ public class Servidor extends Thread {
 			try (Socket socket = servidor.accept();
 					PrintStream out = new PrintStream(socket.getOutputStream());
 					Scanner scan = new Scanner(socket.getInputStream());) {
-				String message = scan.nextLine().trim();
+				String msg = scan.nextLine().trim();
 				InetSocketAddress cliente = new InetSocketAddress(socket.getInetAddress(), 9091);
 				
-				switch (message.substring(0, 2)) {
+				switch (msg.substring(0, 2)) {
 				case "10":
 					conectar(cliente);
 					break;
@@ -77,7 +77,7 @@ public class Servidor extends Thread {
 			if(canal.conectar(cliente)) {
 				out.println("10");
 			} else {
-				out.println("11");
+				out.println("00");
 			}
 			out.flush();
 		}

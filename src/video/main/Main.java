@@ -13,11 +13,14 @@ public class Main{
         System.out.println("Por favor, insira o ip do servidor :");
         System.out.print("IP: ");
         ip=sc.nextLine();
+        System.out.print("Max Conexoes: ");
+        int max=sc.nextInt();
         
-        ThreadPrompt prompt = new ThreadPrompt(ip);
+        ThreadPrompt prompt = new ThreadPrompt(ip,max);
         prompt.start();
+        
         try {
-			prompt.join();
+			prompt.join();//espera a thread chegar aqui para fechar o scanner.
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

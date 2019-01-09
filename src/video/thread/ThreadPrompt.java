@@ -12,27 +12,32 @@ public class ThreadPrompt extends Thread {
 	Scanner sc;
 	String ip;
 	Cliente cliente = null;
+	int max;
 	LinkedList<String> lista = new LinkedList<String>();
 
-	public ThreadPrompt(String ip) {
+	public ThreadPrompt(String ip,int max) {
 		this.ip = ip;
+		this.max = max;
 		sc = new Scanner(System.in);
 	}
 
 	public void run() {
 		String msg = "";
+		
+
+	
+
 		System.out.println("Iniciando Thread do Prompt");
 
 		while (sc.hasNextLine()) {
 			msg = sc.nextLine().trim();
 			
 
-			
-			
+					
 			switch (msg.substring(0, 2)) {
 			case "10":
 
-					cliente = new Cliente(ip, msg.substring(2, 3));
+					cliente = new Cliente(ip, msg.substring(2, 3),max);
 	
 				break;
 			case "12":

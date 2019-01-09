@@ -58,7 +58,7 @@ public class Canal extends Thread {
 	}
 
 	public boolean conectar(InetSocketAddress cliente) {
-		if (clientes.size() < max && !clientes.contains(cliente)) {
+		if (clientes.size() < max && !clientes.contains(cliente)) {//não atingiu a capacidade maxima e não está na lista.
 			clientes.add(cliente);
 			return true;
 		}
